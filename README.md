@@ -44,7 +44,7 @@ For the WebNLG dataset, run:
 ./preprocess_WEBNLG.sh <dataset_folder>
 ```
 
-For the Linked_WikiText dataset, run:
+For the Linked WikiText dataset, run:
 ```
 ./preprocess_LINKEDWIKI.sh <dataset_folder>
 ```

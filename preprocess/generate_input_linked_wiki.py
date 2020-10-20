@@ -118,32 +118,6 @@ def process_triples(doc_triples):
     return nodes, adj_matrix, triples
 
 
-def get_data_dev_test(file_):
-
-    datapoints = []
-    all_tripes = []
-    cats = set()
-
-    xmldoc = minidom.parse(file_)
-    entries = xmldoc.getElementsByTagName('entry')
-    for e in entries:
-
-        triples = get_triples()
-        nodes, adj_matrix, triples = process_triples(mtriples)
-        all_tripes.append(triples)
-
-        lexs = e.getElementsByTagName('lex')
-
-        surfaces = []
-        for l in lexs:
-            l = l.firstChild.nodeValue.strip().lower()
-            new_doc = ' '.join(re.split('(\W)', l))
-            new_doc = ' '.join(new_doc.split())
-            surfaces.append(new_doc)
-        datapoints.append((nodes, adj_matrix, surfaces))
-
-    return datapoints, cats, all_tripes
-
 def get_data(file_):
 
     datapoints = []
@@ -151,7 +125,7 @@ def get_data(file_):
     docs = readfile(file_)
 
     for doc in docs:
-        doc_triples = get_triples(doc) #list
+        doc_triples = get_triples(doc) # list of triples in one document
         nodes, adj_matrix, triples = process_triples(doc_triples)
 
         new_doc = ' '.join(doc['tokens'])
@@ -270,33 +244,17 @@ for idx, datapoints in enumerate(dataset_points):
     nodes = []
     graphs = []
     surfaces = []
-    surfaces_2 = []
-    surfaces_3 = []
+
     for datapoint in datapoints:
         nodes.append(' '.join(datapoint[0]))
         graphs.append(' '.join(datapoint[1]))
-        if part != 'train':
-            surfaces.append(datapoint[2][0])
-            if len(datapoint[2]) > 1:
-                surfaces_2.append(datapoint[2][1])
-            else:
-                surfaces_2.append('')
-            if len(datapoint[2]) > 2:
-                surfaces_3.append(datapoint[2][2])
-            else:
-                surfaces_3.append('')
-        else:
-            surfaces.append(datapoint[2])
+       
+        surfaces.append(datapoint[2])
 
     with open(path + '/' + part + '-src.txt', 'w', encoding='utf8') as f:
         f.write('\n'.join(nodes))
     with open(path + '/' + part + '-surfaces.txt', 'w', encoding='utf8') as f:
         f.write('\n'.join(surfaces))
-    if part != 'train':
-        with open(path + '/' + part + '-surfaces-2.txt', 'w', encoding='utf8') as f:
-            f.write('\n'.join(surfaces_2))
-        with open(path + '/' + part + '-surfaces-3.txt', 'w', encoding='utf8') as f:
-            f.write('\n'.join(surfaces_3))
 
 num_operations = 2000
 os.system('cat ' + path + '/train-src.txt ' + path + '/train-surfaces.txt > ' +
