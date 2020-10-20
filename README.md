@@ -1,3 +1,25 @@
+# Objective
+This repo is forked from [kg2text](https://github.com/UKPLab/kg2text). We try to make [kg2text](https://github.com/UKPLab/kg2text) to support [Linked WikiText-2](https://rloganiv.github.io/linked-wikitext-2/#/) dataset.
+
+# Set up environment
+- Install virtualenv
+```
+python3 -m pip install --user virtualenv
+```
+- Build virtual environment in `kg2text` directory
+```
+cd kg2text
+python3 -m virtualenv .
+```
+- Activate the virtual environment
+```
+source bin/activate
+```
+- Run `setup.sh`
+```
+chmod +x setup.sh
+./setup.sh
+```
 # Modeling Global and Local Node Contexts for Text Generation from Knowledge Graphs
 This repository contains the code for the TACL paper: "[Modeling Global and Local Node Contexts for Text Generation from Knowledge Graphs](https://arxiv.org/pdf/2001.11003.pdf)".
 
@@ -5,20 +27,9 @@ This repository contains the code for the TACL paper: "[Modeling Global and Loca
 
 This project is implemented using the framework [OpenNMT-py](https://github.com/OpenNMT/OpenNMT-py) and the library [PyTorch Geometric](https://github.com/rusty1s/pytorch_geometric). Please, refer to their websites for further details on the installation and dependencies.
 
-## Environments and Dependencies
-
-- python 3.6
-- PyTorch 1.1.0
-- PyTorch Geometric 1.3.1
-- torch-cluster - 1.4.4
-- torch-scatter - 1.3.1
-- torch-sparse - 0.4.0
-- torch-spline-conv - 1.1.0
-- subword-nmt 0.3.6
-
 ## Datasets
 
-In our experiments, we use the following datasets:  [AGENDA](https://github.com/rikdz/GraphWriter/tree/master/data) and [WebNLG](https://webnlg-challenge.loria.fr/challenge_2017/).
+In our experiments, we use the following datasets:  [AGENDA](https://github.com/rikdz/GraphWriter/tree/master/data), [WebNLG](https://webnlg-challenge.loria.fr/challenge_2017/), and [Linked WikiText-2](https://rloganiv.github.io/linked-wikitext-2/#/)
 
 ## Preprocess
 
@@ -31,6 +42,11 @@ For the AGENDA dataset, run:
 For the WebNLG dataset, run:
 ```
 ./preprocess_WEBNLG.sh <dataset_folder>
+```
+
+For the Linked_WikiText dataset, run:
+```
+./preprocess_LINKEDWIKI.sh <dataset_folder>
 ```
 
 
