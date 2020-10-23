@@ -10,7 +10,7 @@ folder_preprocessed_files = sys.argv[2]
 if not os.path.exists(folder_preprocessed_files):
     os.makedirs(folder_preprocessed_files)
 
-datasets = ['train', 'valid', 'test']
+datasets = ['train', 'dev', 'test']
 
 
 def readfile(path):
@@ -220,14 +220,8 @@ for d in datasets:
     files = Path(folder_source + d).rglob('*.jsonl')
     for idx, filename in enumerate(files):
         filename = str(filename)
-        if d == 'test' and 'testdata_with_lex.xml' not in filename:
-            continue
-
-        # if d == 'train':
+        
         datapoint, tripes = get_data(filename)
-        # else:
-        #     datapoint, cats, tripes = get_data_dev_test(filename, train_cat)
-        # all_cats.update(cats)
         datapoints.extend(datapoint)
         triples[d].extend(tripes)
  
