@@ -20,6 +20,23 @@ source bin/activate
 chmod +x setup.sh
 ./setup.sh
 ```
+- Create directories to store downloaded datasets
+```
+mkdir data
+cd data
+mkdir <dataset_folder>
+```
+Example of `linked wikitext` directory sturcture
+```
+data/
+├── /linked_wiki_text
+    ├── train   ---- store train set
+        ├── train.jsonl   
+    ├── dev    ---- store dev set
+        ├── dev.jsonl   
+    └── test   ---- store test set
+        └── test.jsonl 
+```
 # Modeling Global and Local Node Contexts for Text Generation from Knowledge Graphs
 This repository contains the code for the TACL paper: "[Modeling Global and Local Node Contexts for Text Generation from Knowledge Graphs](https://arxiv.org/pdf/2001.11003.pdf)".
 
@@ -53,20 +70,26 @@ For the Linked WikiText dataset, run:
 ## Training
 For traning the model using the AGENDA dataset, execute:
 ```
-./train_AGENDA.sh <graph_encoder> <gpu_id>
+./train_AGENDA.sh <gpu_id> <graph_encoder>
 ```
 
 For the WebNLG dataset, execute:
 ```
-./train_WEBNLG.sh <graph_encoder> <gpu_id>
+./train_WEBNLG.sh <gpu_id> <graph_encoder> 
+```
+
+For the Linked Wikitext dataset, execute:
+```
+./train_LINKEDWIKI.sh <gpu_id> <graph_encoder> 
 ```
 
 Options for `<graph_encoder>` are `pge`, `cge`, `pge-lw` or `cge-lw`. 
 
 Examples:
 ```
-./train_AGENDA.sh pge 0 
-./train_WEBNLG.sh cge-lw 0 
+./train_AGENDA.sh 0 pge  
+./train_WEBNLG.sh 0 cge-lw
+./train_LINKEDWIKI.sh 0 cge-low
 ```
 
 ## Decoding
@@ -75,6 +98,7 @@ For decoding, run:
 ```
 ./decode_AGENDA.sh <gpu_id> <model> <nodes_file> <graph_file> <output>
 ./decode_WEBNLG.sh <gpu_id> <model> <nodes_file> <graph_file> <output>
+./decode_LINKEDWIKI.sh <gpu_id> <model> <nodes_file> <graph_file> <output>
 ```
 
 Example:
