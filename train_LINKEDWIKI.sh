@@ -1,6 +1,6 @@
 #!/bin/bash
 
-data_prefix='graph2text/data/linkedwiki/'
+data_prefix='graph2text/data/linkedwiki/linkedwiki'
 model_dir='graph2text/data/linkedwiki_model'
 
 GPUID=$1

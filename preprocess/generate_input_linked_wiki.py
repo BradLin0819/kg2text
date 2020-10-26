@@ -3,6 +3,7 @@ from pathlib import Path
 import re
 import os
 import json
+from load_linked_wiki import *
 
 folder_source = sys.argv[1]
 folder_preprocessed_files = sys.argv[2]
@@ -11,25 +12,6 @@ if not os.path.exists(folder_preprocessed_files):
     os.makedirs(folder_preprocessed_files)
 
 datasets = ['train', 'dev', 'test']
-
-
-def readfile(path):
-    data = []
-    
-    with open(path) as f:
-        for i in f.readlines():
-            data.append(json.loads(i))
-    return data
-
-
-def get_triples(doc):
-    triples = []
-
-    for annotation in doc['annotations']:
-        for idx, rel in enumerate(annotation['relation']):
-            if rel not in ['@@NEW@@', '@@REFLEXIVE@@']:
-                triples.append((annotation['id'], rel, annotation['parent_id'][idx]))
-    return triples
 
 
 def camel_case_split(identifier):
@@ -125,10 +107,10 @@ def get_data(file_):
     docs = readfile(file_)
 
     for doc in docs:
-        doc_triples = get_triples(doc) # list of triples in one document
+        doc_triples, doc_tokens = get_doc_data(doc) # list of triples and tokens in one document
         nodes, adj_matrix, triples = process_triples(doc_triples)
 
-        new_doc = ' '.join(doc['tokens'])
+        new_doc = ' '.join(doc_tokens)
         datapoints.append((nodes, adj_matrix, new_doc))
         all_tripes.append(triples)
 

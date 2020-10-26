@@ -1,5 +1,5 @@
 # Objective
-This repo is forked from [kg2text](https://github.com/UKPLab/kg2text). We try to make [kg2text](https://github.com/UKPLab/kg2text) to support [Linked WikiText-2](https://rloganiv.github.io/linked-wikitext-2/#/) dataset.
+This repo is forked from [kg2text](https://github.com/UKPLab/kg2text). We try to make [kg2text](https://github.com/UKPLab/kg2text) support [Linked WikiText-2](https://rloganiv.github.io/linked-wikitext-2/#/) dataset.
 
 # Set up environment
 - Install virtualenv

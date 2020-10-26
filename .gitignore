@@ -6,7 +6,6 @@ multi-bleu.perl
 .idea
 *.sublime-*
 .DS_Store
-data/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -144,9 +143,8 @@ Temporary Items
 graph2text/data/
 graph2text/logs/
 
-data/
 results/
-
+data/
 *.pt
 
 *.log
