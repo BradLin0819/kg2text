@@ -3,7 +3,8 @@ from pathlib import Path
 import re
 import os
 import json
-from load_linked_wiki import *
+from linked_wiki_utils import *
+from planning_tgt import *
 
 folder_source = sys.argv[1]
 folder_preprocessed_files = sys.argv[2]
@@ -22,7 +23,7 @@ def camel_case_split(identifier):
         token = token.replace('(', '')
         token_split = token.split('_')
         for t in token_split:
-            new_d.append(t.lower())
+            new_d.append(t)
     return new_d
 
 
@@ -35,7 +36,7 @@ def get_nodes(n):
     n = n.replace('_', ' ')
 
     # n = ' '.join(re.split('(\W)', n))
-    n = n.lower()
+    # n = n.lower()
     n = n.split()
 
     return n
@@ -104,6 +105,7 @@ def get_data(file_):
 
     datapoints = []
     all_tripes = []
+    ordered_tgt = []
     docs = readfile(file_)
 
     for doc in docs:
@@ -113,15 +115,15 @@ def get_data(file_):
         new_doc = ' '.join(doc_tokens)
         datapoints.append((nodes, adj_matrix, new_doc))
         all_tripes.append(triples)
+        ordered_tgt.append(generate_ordered_triples(doc))
 
-    return datapoints, all_tripes
+    return datapoints, all_tripes, ordered_tgt
 
 
-def process_bpe(triples, file_, file_new, file_graph_new):
+def process_bpe(triples, ordered_tgts, file_, file_new, file_graph_new, file_ordered_tgt):
     f = open(file_, 'r').readlines()
 
     datapoints = []
-
     print('processing', len(triples), 'triples')
     assert len(f) == len(triples)
 
@@ -136,7 +138,7 @@ def process_bpe(triples, file_, file_new, file_graph_new):
         nodes_file = []
 
         for e in l:
-            e = e.lower().strip()
+            e = e.strip()
             e_split = e.split()
             e_split = list(filter(None, e_split))
             nodes_file.append((e_split, e))
@@ -174,11 +176,11 @@ def process_bpe(triples, file_, file_new, file_graph_new):
                     l = '(' + str(original_node[n2]['words'][k])
                     l += ',' + str(edge_idx) + ',3,3)'
                     adj_matrix.append(l)
-
         datapoints.append((nodes, adj_matrix))
 
     f_new = open(file_new, 'w')
     f_graph_new = open(file_graph_new, 'w')
+    f_ordered_tgt = open(file_ordered_tgt, 'w')
     nodes = []
     graphs = []
     for dp in datapoints:
@@ -189,23 +191,35 @@ def process_bpe(triples, file_, file_new, file_graph_new):
     f_new.close()
     f_graph_new.write('\n'.join(graphs))
     f_graph_new.close()
+
+    with open(file_ordered_tgt, 'w') as f_ordered_tgt:
+        for ordered_tgt in ordered_tgts:
+            tgt_dict = defaultdict()
+            tgt_dict["tgt"] = ordered_tgt
+            json.dump(tgt_dict, f_ordered_tgt)
+            f_ordered_tgt.write('\n')
+
     print('done')
 
 
 triples = {}
 # train_cat = set()
 dataset_points = []
+ordered_tgts = {}
+
 for d in datasets:
     triples[d] = []
     datapoints = []
-    all_cats = set()
+    ordered_tgts[d] = []
+
     files = Path(folder_source + d).rglob('*.jsonl')
     for idx, filename in enumerate(files):
         filename = str(filename)
         
-        datapoint, tripes = get_data(filename)
+        datapoint, tripes, orderedtgt = get_data(filename)
         datapoints.extend(datapoint)
         triples[d].extend(tripes)
+        ordered_tgts[d].extend(orderedtgt)
  
     print(d, len(datapoints))
     print(d, ' -> triples:', len(triples[d]))
@@ -228,33 +242,34 @@ for idx, datapoints in enumerate(dataset_points):
         surfaces.append(datapoint[2])
 
     with open(path + '/' + part + '-src.txt', 'w', encoding='utf8') as f:
-        f.write('\n'.join(nodes))
+        f.write('\n'.join(nodes)+'\n')
     with open(path + '/' + part + '-surfaces.txt', 'w', encoding='utf8') as f:
         f.write('\n'.join(surfaces))
 
-num_operations = 2000
-os.system('cat ' + path + '/train-src.txt ' + path + '/train-surfaces.txt > ' +
-          path + '/training_source.txt')
-print('creating bpe codes...')
-os.system('subword-nmt learn-bpe -s ' + str(num_operations) + ' < ' +
-                path + '/training_source.txt > ' + path + '/codes-bpe.txt')
-print('done')
-print('converting files to bpe...')
+# num_operations = 2000
+# os.system('cat ' + path + '/train-src.txt ' + path + '/train-surfaces.txt > ' +
+#           path + '/training_source.txt')
+# print('creating bpe codes...')
+# os.system('subword-nmt learn-bpe -s ' + str(num_operations) + ' < ' +
+#                 path + '/training_source.txt > ' + path + '/codes-bpe.txt')
+# print('done')
+# print('converting files to bpe...')
 
-for d in datasets:
-    file_pre = path + '/' + d + '-src.txt'
-    file_ = path + '/' + d + '-src-bpe.txt'
-    os.system('subword-nmt apply-bpe -c ' + path + '/codes-bpe.txt < ' + file_pre + ' > ' + file_)
+# for d in datasets:
+#     file_pre = path + '/' + d + '-src.txt'
+#     file_ = path + '/' + d + '-src-bpe.txt'
+#     os.system('subword-nmt apply-bpe -c ' + path + '/codes-bpe.txt < ' + file_pre + ' > ' + file_)
 
-    file_pre = path + '/' + d + '-surfaces.txt'
-    file_ = path + '/' + d + '-surfaces-bpe.txt'
-    os.system('subword-nmt apply-bpe -c ' + path + '/codes-bpe.txt < ' + file_pre + ' > ' + file_)
-print('done')
+#     file_pre = path + '/' + d + '-surfaces.txt'
+#     file_ = path + '/' + d + '-surfaces-bpe.txt'
+#     os.system('subword-nmt apply-bpe -c ' + path + '/codes-bpe.txt < ' + file_pre + ' > ' + file_)
+# print('done')
 
 for d in datasets:
     print('dataset:', d)
-    file_ = path + '/' + d + '-src-bpe.txt'
+    file_ = path + '/' + d + '-src.txt'
     file_new = path + '/' + d + '-nodes.txt'
     file_graph_new = path + '/' + d + '-graph.txt'
-    process_bpe(triples[d], file_, file_new, file_graph_new)
+    file_ordered_tgt = path + '/' + d + '-ordered-tgt.jsonl'
+    process_bpe(triples[d], ordered_tgts[d], file_, file_new, file_graph_new, file_ordered_tgt)
 

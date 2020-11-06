@@ -11,6 +11,14 @@ __pycache__/
 *.py[cod]
 *$py.class
 COPYING
+.vscode
+glove_dir/
+log_dir/
+linked-wikitext-2*
+linkedwiki.jsonl
+outputs/
+cge-lw-pretrain-test
+*.txt
 
 # C extensions
 *.so

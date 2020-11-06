@@ -1,7 +1,7 @@
 import os
 import json
 import re
-from preprocess.load_linked_wiki import *
+from preprocess.linked_wiki_utils import *
 file_path = 'data/linked_wiki_data/train/train.jsonl'
 
 if __name__ == '__main__':

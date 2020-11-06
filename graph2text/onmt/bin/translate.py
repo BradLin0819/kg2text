@@ -15,7 +15,7 @@ def translate(opt):
     ArgumentParser.validate_translate_opts(opt)
     logger = init_logger(opt.log_file)
 
-    translator = build_translator(opt, report_score=True)
+    translator = build_translator(opt, logger=logger, report_score=True)
     src_shards = split_corpus(opt.src, opt.shard_size)
     graph_shards = split_corpus(opt.graph, opt.shard_size)
     tgt_shards = split_corpus(opt.tgt, opt.shard_size)

@@ -757,12 +757,13 @@ class Translator(object):
         # Rollback pointer to the beginning.
         self.out_file.seek(0)
         print()
-
+        
         res = subprocess.check_output(
             "perl %s/tools/multi-bleu.perl %s" % (base_dir, tgt_path),
             stdin=self.out_file, shell=True
         ).decode("utf-8")
-
+        assert res is not None
+        self._log(res)
         msg = ">> " + res.strip()
         return msg
 

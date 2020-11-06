@@ -2,7 +2,7 @@
 
 data_prefix='graph2text/data/linkedwiki/linkedwiki'
 model_dir='graph2text/data/linkedwiki_model'
-
+pretrain_emb_dir='graph2text'
 GPUID=$1
 graph_encoder=$2
 
@@ -16,10 +16,8 @@ python -u graph2text/train.py \
                         -save_checkpoint_steps 5000 \
                         -valid_steps 5000 \
                         -report_every 50 \
-                        -train_steps 250000 \
+                        -train_steps 600000 \
                         -warmup_steps 8000 \
-                        --share_decoder_embeddings \
-                        -share_embeddings \
                         --position_encoding \
                         --optim adam \
                         -adam_beta1 0.9 \
@@ -43,5 +41,11 @@ python -u graph2text/train.py \
                         -word_vec_size 256 \
                         -enc_rnn_size 256 \
                         -dec_rnn_size 256 \
+                        -pre_word_vecs_enc ${pretrain_emb_dir}/rel_ent.enc.pt \
+                        -pre_word_vecs_dec ${pretrain_emb_dir}/rel_ent.dec.pt \
                         -number_edge_types 4 \
-                        -heads 4
+                        -heads 4 \
+                        --log_file linkedwiki-pretrain-cge-lw-train-converge.log \
+                        --tensorboard \
+                        --tensorboard_log_dir log_dir
+
