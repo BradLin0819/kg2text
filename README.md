@@ -48,7 +48,7 @@ The structure of the planning order tgt file is as follows:
     {
         # tgt in original entity and relation id format
         "ids":[
-            # triples of sentence1
+            # triples of sentence 1
             [
                 [Q7809, P463, Q5119],
                 [entity_id, relation_id, entity_id],
@@ -62,7 +62,7 @@ The structure of the planning order tgt file is as follows:
         ],
         # convert ids into the index format
         "indices":[
-            # triples of sentence1
+            # triples of sentence 1
             [
                 [25, 3, 28],
                 [entity_index, relation_index, entity_index],
