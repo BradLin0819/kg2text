@@ -38,28 +38,19 @@ def add_triple(triples, annotation):
 def get_doc_data(doc, min_entities=15):
     triples = []
     doc_tokens = doc['tokens']
-    last_entity_span_end = -1
+    num_entities = 0
+    end_of_sent_index = 0
 
-    for ent_idx, annotation in enumerate(doc['annotations'][:min_entities]):
-        add_triple(triples, annotation)
-        
-        if ent_idx == (min_entities - 1):
-            last_entity_span_end = annotation['span'][1]
-    
-    assert last_entity_span_end != -1
+    while num_entities < min_entities:
+        end_of_sent_index = doc_tokens.index('@@END@@', end_of_sent_index + 1)
 
-    # Extract tokens until '.'
-    while doc_tokens[last_entity_span_end-1] != '.':
-        last_entity_span_end += 1
+        for annotation in doc['annotations'][num_entities:]:
+            if annotation['span'][1] < end_of_sent_index:
+                add_triple(triples, annotation)
+                num_entities += 1
 
-    # Add entities before '.'
-    for ent_idx, annotation in enumerate(doc['annotations'][min_entities:]):
-        # Check end of span first
-        if annotation['span'][1] <= last_entity_span_end:
-            add_triple(triples, annotation)
-        else:
-            break
-    sub_tokens = [token.lower() for token in doc_tokens[:last_entity_span_end] if re.match(r'@@\w+@@', token) is None]
+    assert num_entities >= min_entities
+    sub_tokens = [token.lower() for token in doc_tokens[:end_of_sent_index+1] if re.match(r'@@\w+@@', token) is None]
     return triples, sub_tokens
 
 

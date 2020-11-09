@@ -19,7 +19,7 @@ linkedwiki.jsonl
 outputs/
 cge-lw-pretrain-test
 *.txt
-
+*.zip
 # C extensions
 *.so
 

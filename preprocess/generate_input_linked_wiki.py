@@ -124,6 +124,7 @@ def process_bpe(triples, ordered_tgts, file_, file_new, file_graph_new, file_ord
     f = open(file_, 'r').readlines()
 
     datapoints = []
+    ordered_tgts_indices = []
     print('processing', len(triples), 'triples')
     assert len(f) == len(triples)
 
@@ -131,6 +132,7 @@ def process_bpe(triples, ordered_tgts, file_, file_new, file_graph_new, file_ord
         original_node = {}
         nodes = []
         adj_matrix = []
+        edge_indices = []
 
         l = f[idx]
         l = l.strip().split('</entity>')
@@ -143,20 +145,30 @@ def process_bpe(triples, ordered_tgts, file_, file_new, file_graph_new, file_ord
             e_split = list(filter(None, e_split))
             nodes_file.append((e_split, e))
 
+        
+        num_triples_of_all_sents = 0
+
+        for sent in ordered_tgts[idx]:
+            num_triples_of_all_sents += len(sent)
+
+        assert len(t) == num_triples_of_all_sents
+
         for triple in t:
-            edge, e1, e2, rel = triple
+            edge, e1, e2, rel = triple # each triple of one document
             n1 = nodes_file[e1][1]
             n2 = nodes_file[e2][1]
             add_nodes_bpe(nodes_file[e1][0], n1, original_node, nodes)
 
             edges_idx = []
             nodes.append('<relation>')
+            
             for e in nodes_file[rel][0]:
                 nodes.append(e)
                 edges_idx.append(len(nodes) - 1)
+                edge_indices.append(edges_idx[-1])
+
             nodes.append('</relation>')
             add_nodes_bpe(nodes_file[e2][0], n2, original_node, nodes)
-
             for k in original_node[n1]['words'].keys():
                 for edge_idx in edges_idx:
                     l = '(' + str(original_node[n1]['words'][k])
@@ -176,8 +188,27 @@ def process_bpe(triples, ordered_tgts, file_, file_new, file_graph_new, file_ord
                     l = '(' + str(original_node[n2]['words'][k])
                     l += ',' + str(edge_idx) + ',3,3)'
                     adj_matrix.append(l)
-        datapoints.append((nodes, adj_matrix))
 
+        assert len(edge_indices) == len(t)
+        
+        # convert entity_id, edge_id into indices
+        sents_triples_indices = [] # list of triples of each sentence
+        relation_idx = 0
+
+        for sent_triples in ordered_tgts[idx]:
+            # sent_triples: all triples in one sentence
+            sent_triples_indices = []
+            for triple in sent_triples:
+                e1, _, e2 = triple
+                sent_triples_indices.append([original_node[e1]['words'][e1], edge_indices[relation_idx], original_node[e2]['words'][e2]])
+                relation_idx += 1
+            sents_triples_indices.append(sent_triples_indices)
+        
+        ordered_tgts_indices.append(sents_triples_indices)
+        datapoints.append((nodes, adj_matrix))
+    
+    assert len(ordered_tgts_indices) == len(ordered_tgts)
+    
     f_new = open(file_new, 'w')
     f_graph_new = open(file_graph_new, 'w')
     f_ordered_tgt = open(file_ordered_tgt, 'w')
@@ -193,9 +224,11 @@ def process_bpe(triples, ordered_tgts, file_, file_new, file_graph_new, file_ord
     f_graph_new.close()
 
     with open(file_ordered_tgt, 'w') as f_ordered_tgt:
-        for ordered_tgt in ordered_tgts:
+        for idx, ordered_tgt_indices in enumerate(ordered_tgts_indices):
             tgt_dict = defaultdict()
-            tgt_dict["tgt"] = ordered_tgt
+            tgt_dict["tgt"] = defaultdict()
+            tgt_dict["tgt"]["ids"] = ordered_tgts[idx]
+            tgt_dict["tgt"]["indices"] = ordered_tgt_indices
             json.dump(tgt_dict, f_ordered_tgt)
             f_ordered_tgt.write('\n')
 

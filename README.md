@@ -37,6 +37,48 @@ data/
     └── test   ---- store test set
         └── test.jsonl 
 ```
+# Planning order tgt files 
+After executing `preprocess_LINKEDWIKI.sh`, the planning order tgt files will be generated in `graph2text/data/linkedwiki/` directory. The generated files are as follows:
+- {train, dev, test}-ordered-tgt.jsonl
+
+The structure of the planning order tgt file is as follows:
+```
+# Each line represents a document
+{"tgt": 
+    {
+        # tgt in original entity and relation id format
+        "ids":[
+            # triples of sentence1
+            [
+                [Q7809, P463, Q5119],
+                [entity_id, relation_id, entity_id],
+                ...
+            ],
+            # triples of sentence 2
+            [
+                ...
+            ],
+            ...
+        ],
+        # convert ids into the index format
+        "indices":[
+            # triples of sentence1
+            [
+                [25, 3, 28],
+                [entity_index, relation_index, entity_index],
+                ...
+            ],
+            # triples of sentence 2
+            [
+                ...
+            ],
+            ...
+        ]
+    }
+}
+{"tgt": ...}
+```
+
 # Modeling Global and Local Node Contexts for Text Generation from Knowledge Graphs
 This repository contains the code for the TACL paper: "[Modeling Global and Local Node Contexts for Text Generation from Knowledge Graphs](https://arxiv.org/pdf/2001.11003.pdf)".
 
